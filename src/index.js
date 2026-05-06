@@ -1401,7 +1401,6 @@ function baseCSS() {
     }
     html { font-size: 15px; -webkit-font-smoothing: antialiased; }
     body { font-family: 'Instrument Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background-color: var(--bg); color: var(--text-primary); line-height: 1.7; min-height: 100vh; }
-    body::before { content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; background-image: radial-gradient(rgba(255,255,255,0.03) 1px, transparent 1px); background-size: 32px 32px; mask-image: radial-gradient(ellipse at 50% 0%, black 30%, transparent 70%); -webkit-mask-image: radial-gradient(ellipse at 50% 0%, black 30%, transparent 70%); }
     a { color: inherit; text-decoration: none; }
     .mono { font-family: 'JetBrains Mono', monospace; }
     .container { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
@@ -2403,7 +2402,6 @@ function renderHomeDashboard({ newsLatest, modelRankings, trendingRepos, dashboa
     }
     html { font-size: 15px; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
     body { font-family: 'Instrument Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background-color: var(--bg); color: var(--text-primary); line-height: 1.7; min-height: 100vh; position: relative; }
-    body::before { content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; background-image: radial-gradient(rgba(255,255,255,0.03) 1px, transparent 1px); background-size: 32px 32px; mask-image: radial-gradient(ellipse at 50% 0%, black 30%, transparent 70%); -webkit-mask-image: radial-gradient(ellipse at 50% 0%, black 30%, transparent 70%); }
     a { color: inherit; text-decoration: none; }
     .mono { font-family: 'JetBrains Mono', monospace; }
 
@@ -2696,7 +2694,6 @@ function renderHTML(articles, models, trendingRepos) {
     }
     html { font-size: 15px; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
     body { font-family: 'Instrument Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background-color: var(--bg); color: var(--text-primary); line-height: 1.7; min-height: 100vh; position: relative; }
-    body::before { content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; background-image: radial-gradient(rgba(255,255,255,0.03) 1px, transparent 1px); background-size: 32px 32px; mask-image: radial-gradient(ellipse at 50% 0%, black 30%, transparent 70%); -webkit-mask-image: radial-gradient(ellipse at 50% 0%, black 30%, transparent 70%); }
     a { color: inherit; text-decoration: none; }
     .mono { font-family: 'JetBrains Mono', monospace; }
     .container { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
@@ -2720,9 +2717,19 @@ function renderHTML(articles, models, trendingRepos) {
     .nav-cta:hover { background: var(--accent-hover); box-shadow: 0 4px 16px rgba(110,231,183,0.2); }
     @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
     @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-    .hero { padding: 72px 0 56px; margin-bottom: 40px; text-align: center; position: relative; overflow: hidden; border-bottom: 1px solid var(--border); background: linear-gradient(135deg, rgba(16,185,129,0.03) 0%, transparent 40%, rgba(59,130,246,0.03) 100%); }
-    .hero::before { content: ''; position: absolute; inset: 0; background: linear-gradient(180deg, transparent 60%, rgba(110,231,183,0.02) 100%); }
-    .hero::after { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px; background: linear-gradient(90deg, transparent, rgba(110,231,183,0.15), transparent); }
+    .hero { padding: 80px 0 60px; margin-bottom: 40px; text-align: center; position: relative; overflow: hidden; border-bottom: 1px solid var(--border); background: #0a0a0f; }
+    .hero-grid { position: absolute; inset: 0; background-image: linear-gradient(rgba(110,231,183,0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(110,231,183,0.05) 1px, transparent 1px); background-size: 40px 40px; animation: gridShift 8s linear infinite; }
+    .hero-grid::after { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse at 50% 50%, transparent 30%, #0a0a0f 70%); }
+    @keyframes gridShift { 0% { transform: translate(0,0); } 100% { transform: translate(40px,40px); } }
+    .hero-scan { position: absolute; top: 0; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, transparent, rgba(110,231,183,0.6), transparent); animation: scanLine 3s ease-in-out infinite; box-shadow: 0 0 20px rgba(110,231,183,0.3), 0 0 60px rgba(110,231,183,0.1); }
+    @keyframes scanLine { 0% { top: -2px; opacity: 0; } 10% { opacity: 1; } 90% { opacity: 1; } 100% { top: 100%; opacity: 0; } }
+    .hero-glow { position: absolute; top: 50%; left: 50%; width: 400px; height: 400px; transform: translate(-50%,-50%); border-radius: 50%; background: radial-gradient(circle, rgba(110,231,183,0.06), transparent 60%); animation: heroBreath 5s ease-in-out infinite; }
+    @keyframes heroBreath { 0%,100% { transform: translate(-50%,-50%) scale(0.9); opacity: 0.5; } 50% { transform: translate(-50%,-50%) scale(1.1); opacity: 1; } }
+    .hero-corner { position: absolute; width: 20px; height: 20px; border-color: rgba(110,231,183,0.2); border-style: solid; }
+    .hero-corner-tl { top: 20px; left: 20px; border-width: 2px 0 0 2px; }
+    .hero-corner-tr { top: 20px; right: 20px; border-width: 2px 2px 0 0; }
+    .hero-corner-bl { bottom: 20px; left: 20px; border-width: 0 0 2px 2px; }
+    .hero-corner-br { bottom: 20px; right: 20px; border-width: 0 2px 2px 0; }
     .hero::before { content: ''; position: absolute; bottom: -200px; left: 50%; transform: translateX(-50%); width: 600px; height: 400px; background: radial-gradient(ellipse at center, rgba(110,231,183,0.1) 0%, transparent 70%); pointer-events: none; z-index: 0; filter: blur(80px); }
     .hero-title { font-size: 40px; font-weight: 700; letter-spacing: -1.5px; line-height: 1.15; margin-bottom: 16px; color: var(--text-primary); }
     .hero-title .accent { background: linear-gradient(135deg, #00c8ff, #00ffa3, #00c8ff); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
@@ -2841,6 +2848,13 @@ function renderHTML(articles, models, trendingRepos) {
 
   <!-- Hero -->
   <section class="hero">
+    <div class="hero-grid"></div>
+    <div class="hero-glow"></div>
+    <div class="hero-scan"></div>
+    <div class="hero-corner hero-corner-tl"></div>
+    <div class="hero-corner hero-corner-tr"></div>
+    <div class="hero-corner hero-corner-bl"></div>
+    <div class="hero-corner hero-corner-br"></div>
     <div class="container" style="position:relative;z-index:1;">
       <h1 class="hero-title">What's Trending in <span class="accent">AI</span></h1>
       <p class="hero-subtitle">The latest in AI models, tools, and industry moves.</p>
