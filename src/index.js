@@ -2816,8 +2816,8 @@ function renderHTML(articles, models, trendingRepos) {
     .sidebar-section:nth-child(3) { animation: fadeUp 0.6s ease 0.7s both; }
     .sidebar-title { font-family: 'JetBrains Mono', monospace; font-size: 10px; font-weight: 500; letter-spacing: 2.5px; text-transform: uppercase; color: var(--text-tertiary); margin-bottom: 20px; }
     .topics-wrap { display: flex; flex-wrap: wrap; gap: 8px; }
-    .topic-pill { font-size: 13px; font-weight: 500; padding: 6px 14px; border-radius: 8px; background: rgba(255,255,255,0.04); color: var(--text-secondary); transition: background var(--transition), color var(--transition); cursor: pointer; }
-    .topic-pill:hover { background: rgba(110,231,183,0.1); color: var(--accent-hover); }
+    .topic-pill { font-size: 12px; font-weight: 500; padding: 6px 16px; border-radius: 20px; background: linear-gradient(135deg, rgba(52,211,153,0.08), rgba(59,130,246,0.06)); border: 1px solid rgba(52,211,153,0.1); color: var(--text-secondary); transition: all 0.3s ease; cursor: pointer; text-decoration: none; display: inline-block; }
+    .topic-pill:hover { background: linear-gradient(135deg, rgba(52,211,153,0.15), rgba(59,130,246,0.12)); border-color: rgba(52,211,153,0.25); color: var(--accent); transform: translateY(-1px); box-shadow: 0 4px 12px rgba(52,211,153,0.1); }
     .model-row { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--border); }
     .model-row:last-child { border-bottom: none; padding-bottom: 0; }
     .model-row:first-child { padding-top: 0; }
@@ -3042,6 +3042,24 @@ function renderHTML(articles, models, trendingRepos) {
   }
   requestAnimationFrame(draw);
 })();
+// GA event tracking
+document.addEventListener('click',function(e){
+  var a=e.target.closest('a');
+  if(!a||!window.gtag)return;
+  var href=a.getAttribute('href')||'';
+  if(href.startsWith('/news/'))gtag('event','click_news',{item:href});
+  else if(href.startsWith('/repos/'))gtag('event','click_repo',{item:href});
+  else if(href.startsWith('/tools/'))gtag('event','click_tool',{item:href});
+  else if(href.startsWith('/compare/'))gtag('event','click_compare',{item:href});
+  else if(href.startsWith('/topic/'))gtag('event','click_topic',{item:href});
+  else if(href.startsWith('/models'))gtag('event','click_models');
+});
+// Scroll depth tracking
+var scrollSent={};
+window.addEventListener('scroll',function(){
+  var pct=Math.round(100*window.scrollY/(document.body.scrollHeight-window.innerHeight));
+  [25,50,75,100].forEach(function(t){if(pct>=t&&!scrollSent[t]){scrollSent[t]=true;if(window.gtag)gtag('event','scroll_depth',{depth:t});}});
+});
 </script>
 </body>
 </html>`;
@@ -3230,6 +3248,12 @@ function renderSitemapXml(articles, newsArticles, tools, trendingRepos) {
     <lastmod>${today}</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>
+  </url>`).join('')}${['best-ai-coding-tools','best-ai-image-generators','best-ai-chatbots','best-ai-video-tools','best-ai-writing-tools','open-source-llms-guide'].map(s=>`
+  <url>
+    <loc>https://whatstrending.ai/guide/${s}</loc>
+    <lastmod>${today}</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
   </url>`).join('')}${(trendingRepos||[]).map(r=>`
   <url>
     <loc>https://whatstrending.ai/repos/${r.name}</loc>
@@ -3699,6 +3723,60 @@ export default {
       getArticlesForDisplay(env),
       getModelsFromDB(env, {}),
     ]);
+
+    // ---- GUIDES (evergreen SEO pages) ----
+    const GUIDES = {
+      'best-ai-coding-tools': { title: 'Best AI Coding Tools in 2026', desc: 'The top AI-powered coding tools and IDE assistants for developers in 2026. Compare Cursor, Claude Code, GitHub Copilot, and more.', tools: ['Cursor','Claude Code','GitHub Copilot','Codex','Windsurf','Bolt','Replit','v0'] },
+      'best-ai-image-generators': { title: 'Best AI Image Generators in 2026', desc: 'Compare the top AI image generation tools. Midjourney, DALL-E, Stable Diffusion, Flux, Leonardo and more.', tools: ['Midjourney','DALL-E','Stable Diffusion','Leonardo','Flux','Adobe Firefly','Ideogram'] },
+      'best-ai-chatbots': { title: 'Best AI Chatbots in 2026', desc: 'ChatGPT, Claude, Gemini, Grok, Perplexity — which AI chatbot is best? Comprehensive comparison.', tools: ['ChatGPT','Claude','Gemini','Grok','Perplexity','Kagi'] },
+      'best-ai-video-tools': { title: 'Best AI Video Generation Tools in 2026', desc: 'Compare Sora, Runway, Kling, Veo 3, Pika and other AI video tools for creators.', tools: ['Sora','Runway','Kling','Veo 3','Pika','HeyGen','Synthesia'] },
+      'best-ai-writing-tools': { title: 'Best AI Writing Tools in 2026', desc: 'Top AI writing assistants for content creation, copywriting, and editing.', tools: ['Jasper','Copy.ai','Grammarly','QuillBot','Notion AI','Gamma'] },
+      'open-source-llms-guide': { title: 'Open Source LLMs: Complete Guide for 2026', desc: 'Everything you need to know about open source large language models in 2026. Llama, Mistral, DeepSeek, Qwen, and more.', tools: ['Llama 4','Mistral','DeepSeek','Qwen','Gemma'] },
+    };
+
+    if (path.startsWith('/guide/') && GUIDES[path.replace('/guide/', '')]) {
+      const slug = path.replace('/guide/', '');
+      const guide = GUIDES[slug];
+      const toolCards = guide.tools.map(t => {
+        const tool = AI_TOOLS_SEED.find(x => x.name === t);
+        return tool ? `<div style="padding:16px;border:1px solid var(--border);border-radius:10px;"><div style="font-size:15px;font-weight:600;color:var(--text-primary);margin-bottom:4px;">${tool.name}</div><div style="font-size:13px;color:var(--text-secondary);line-height:1.5;">${tool.tagline || tool.description}</div><div style="margin-top:8px;font-size:12px;color:var(--accent);">${tool.pricing}</div></div>` : `<div style="padding:16px;border:1px solid var(--border);border-radius:10px;"><div style="font-size:15px;font-weight:600;color:var(--text-primary);">${t}</div></div>`;
+      }).join('');
+
+      return new Response(`${renderPageHead(guide.title + ' | whatstrending.ai', guide.desc, '/guide/' + slug)}
+      <style>${baseCSS()}
+        .guide{max-width:720px;margin:0 auto;padding:48px 20px 80px;}
+        .guide h1{font-size:32px;font-weight:700;letter-spacing:-1px;margin-bottom:12px;}
+        .guide .lead{font-size:16px;color:var(--text-secondary);line-height:1.7;margin-bottom:32px;}
+        .guide-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px;margin-bottom:40px;}
+        .guide h2{font-size:20px;font-weight:600;margin:32px 0 16px;}
+        .guide p{font-size:15px;color:var(--text-secondary);line-height:1.7;margin-bottom:16px;}
+        .guide-cta{display:inline-block;margin-top:16px;padding:10px 20px;background:var(--accent);color:white;border-radius:8px;text-decoration:none;font-weight:600;font-size:14px;}
+        .guide-related{margin-top:48px;padding-top:32px;border-top:1px solid var(--border);}
+        .guide-related-title{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--text-tertiary);margin-bottom:16px;}
+        .guide-related-links{display:flex;flex-direction:column;gap:8px;}
+        .guide-related-links a{font-size:14px;color:var(--accent);text-decoration:none;}
+      </style>
+      <script type="application/ld+json">${JSON.stringify({"@context":"https://schema.org","@type":"Article","headline":guide.title,"description":guide.desc,"url":"https://whatstrending.ai/guide/"+slug,"publisher":{"@type":"Organization","name":"whatstrending.ai"},"datePublished":"2026-05-06","dateModified":"2026-05-06"})}</script>
+      </head><body>
+      ${renderNav('guide')}
+      <section class="guide" style="position:relative;z-index:1;">
+        <h1>${guide.title}</h1>
+        <p class="lead">${guide.desc}</p>
+        <div class="guide-grid">${toolCards}</div>
+        <h2>How we evaluate</h2>
+        <p>We look at real-world performance, pricing, ease of use, and community adoption. Our rankings are based on data from multiple sources including model benchmarks, GitHub stars, and user reviews.</p>
+        <p>This guide is updated regularly as new tools emerge and existing ones improve.</p>
+        <a href="/tools" class="guide-cta">Browse all AI tools</a>
+        <div class="guide-related">
+          <div class="guide-related-title">More Guides</div>
+          <div class="guide-related-links">
+            ${Object.entries(GUIDES).filter(([s]) => s !== slug).map(([s, g]) => `<a href="/guide/${s}">${g.title}</a>`).join('')}
+          </div>
+        </div>
+      </section>
+      ${renderFooter()}
+      </body></html>`, { headers: { 'Content-Type': 'text/html;charset=utf-8', 'Cache-Control': 'public, max-age=3600' } });
+    }
 
     // ---- SEARCH ----
     if (path === '/search') {
