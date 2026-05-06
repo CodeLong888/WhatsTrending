@@ -1741,6 +1741,7 @@ function renderToolsPage(tools, activeCategory) {
     .tool-category { font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 1px; text-transform: uppercase; color: var(--text-tertiary); }
     @media (max-width: 768px) { .tools-grid { grid-template-columns: 1fr; } }
   </style>
+  <script type="application/ld+json">${JSON.stringify({"@context":"https://schema.org","@type":"CollectionPage","name":"AI Tool Directory","description":"Discover the best AI tools for coding, writing, image generation, video, chat, and productivity","url":"https://whatstrending.ai/tools"})}</script>
 </head>
 <body>
   ${renderNav('tools')}
@@ -1916,6 +1917,7 @@ function renderComparePage(comparison, toolA, toolB) {
     .compare-link:hover { border-color: var(--accent); color: var(--accent); }
     @media (max-width: 768px) { .compare-grid { grid-template-columns: 1fr; } }
   </style>
+  <script type="application/ld+json">${JSON.stringify({"@context":"https://schema.org","@type":"WebPage","name":`${comparison.a} vs ${comparison.b}`,"description":`Compare ${comparison.a} and ${comparison.b} — features, pricing, and which AI tool is better for your needs`,"url":`https://whatstrending.ai/compare/${comparison.slug}`})}</script>
 </head>
 <body>
   ${renderNav('compare')}
@@ -2221,6 +2223,7 @@ function renderModelsPage(rankings) {
       .lb-hide-mobile { display: none; }
     }
   </style>
+  <script type="application/ld+json">${JSON.stringify({"@context":"https://schema.org","@type":"CollectionPage","name":"AI Model Rankings","description":"Real-time AI model leaderboard with arena scores across Overall, Coding, Reasoning, and Math categories","url":"https://whatstrending.ai/models"})}</script>
 </head>
 <body>
 
@@ -3698,6 +3701,63 @@ export default {
       getArticlesForDisplay(env),
       getModelsFromDB(env, {}),
     ]);
+
+    // ---- SEARCH ----
+    if (path === '/search') {
+      const q = (url.searchParams.get('q') || '').trim().toLowerCase();
+      let allNews = [], allRepos = [];
+      try {
+        if (env.NEWS_KV) {
+          const nr = await env.NEWS_KV.get('news_index', 'json');
+          if (nr && Array.isArray(nr)) allNews = nr;
+          const rr = await env.NEWS_KV.get('trending_repos', 'json');
+          if (rr && Array.isArray(rr)) allRepos = rr;
+        }
+      } catch {}
+      const allTools = await getToolsFromDB(env, 'all');
+      const match = (text) => (text || '').toLowerCase().includes(q);
+      const newsResults = q ? allNews.filter(a => match(a.title) || match(a.summary)).slice(0, 15) : [];
+      const repoResults = q ? allRepos.filter(r => match(r.name) || match(r.description)).slice(0, 15) : [];
+      const toolResults = q ? allTools.filter(t => match(t.name) || match(t.description) || match(t.tagline)).slice(0, 10) : [];
+      const total = newsResults.length + repoResults.length + toolResults.length;
+
+      return new Response(`${renderPageHead(
+        q ? q + ' — Search | whatstrending.ai' : 'Search — whatstrending.ai',
+        'Search across AI news, trending repos, and tools on whatstrending.ai.',
+        '/search'
+      )}
+      <style>${baseCSS()}
+        .search-page{max-width:720px;margin:0 auto;padding:40px 20px 80px;}
+        .search-bar{display:flex;gap:8px;margin-bottom:32px;}
+        .search-input{flex:1;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px 18px;color:var(--text-primary);font-size:15px;outline:none;font-family:inherit;}
+        .search-input:focus{border-color:var(--accent);}
+        .search-btn{background:var(--accent);color:white;border:none;border-radius:10px;padding:14px 20px;font-weight:600;cursor:pointer;font-size:14px;}
+        .sr-section{margin-bottom:32px;}
+        .sr-title{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--text-tertiary);margin-bottom:16px;padding-bottom:8px;border-bottom:1px solid var(--border);}
+        .sr-item{display:block;padding:14px 0;border-bottom:1px solid var(--border);text-decoration:none;color:inherit;transition:padding-left 0.2s;}
+        .sr-item:hover{padding-left:8px;}
+        .sr-item-title{font-size:15px;font-weight:600;color:var(--text-primary);margin-bottom:4px;}
+        .sr-item-meta{font-size:12px;color:var(--text-tertiary);font-family:'JetBrains Mono',monospace;}
+        .sr-empty{color:var(--text-tertiary);font-size:14px;padding:40px 0;text-align:center;}
+        .sr-count{font-size:13px;color:var(--text-tertiary);margin-bottom:24px;}
+      </style>
+      </head><body>
+      ${renderNav('search')}
+      <section class="search-page" style="position:relative;z-index:1;">
+        <form action="/search" method="GET" class="search-bar">
+          <input class="search-input" name="q" value="${q}" placeholder="Search news, repos, tools..." autofocus/>
+          <button type="submit" class="search-btn">Search</button>
+        </form>
+        ${q ? `<div class="sr-count">${total} results for "${q}"</div>` : ''}
+        ${newsResults.length > 0 ? `<div class="sr-section"><div class="sr-title">News (${newsResults.length})</div>${newsResults.map(a => `<a href="/news/${a.slug}" class="sr-item"><div class="sr-item-title">${a.title}</div><div class="sr-item-meta">${a.source} · ${formatShortDate(a.date)}</div></a>`).join('')}</div>` : ''}
+        ${repoResults.length > 0 ? `<div class="sr-section"><div class="sr-title">Repos (${repoResults.length})</div>${repoResults.map(r => `<a href="/repos/${r.name}" class="sr-item"><div class="sr-item-title">${r.name}</div><div class="sr-item-meta">${r.language || ''} · ${r.stars >= 1000 ? (r.stars/1000).toFixed(1)+'k' : r.stars} stars</div></a>`).join('')}</div>` : ''}
+        ${toolResults.length > 0 ? `<div class="sr-section"><div class="sr-title">Tools (${toolResults.length})</div>${toolResults.map(t => `<a href="/tools/${t.name.toLowerCase().replace(/[^a-z0-9]+/g,'-')}" class="sr-item"><div class="sr-item-title">${t.name}</div><div class="sr-item-meta">${t.category} · ${t.pricing}</div></a>`).join('')}</div>` : ''}
+        ${q && total === 0 ? '<div class="sr-empty">No results found. Try a different search term.</div>' : ''}
+        ${!q ? '<div class="sr-empty">Type something to search across all AI news, repos, and tools.</div>' : ''}
+      </section>
+      ${renderFooter()}
+      </body></html>`, { headers: { 'Content-Type': 'text/html;charset=utf-8' } });
+    }
 
     // ---- ABOUT PAGE ----
     if (path === '/about') {
