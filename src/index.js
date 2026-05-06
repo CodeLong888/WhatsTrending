@@ -278,6 +278,12 @@ const RSS_FEEDS = [
   { url: 'https://venturebeat.com/category/ai/feed/', source: 'VentureBeat' },
   { url: 'https://www.technologyreview.com/feed/', source: 'MIT Tech Review' },
   { url: 'https://huggingface.co/blog/feed.xml', source: 'Hugging Face' },
+  { url: 'https://www.anthropic.com/feed.xml', source: 'Anthropic' },
+  { url: 'https://deepmind.google/blog/rss.xml', source: 'DeepMind' },
+  { url: 'https://www.marktechpost.com/feed/', source: 'MarkTechPost' },
+  { url: 'https://the-decoder.com/feed/', source: 'The Decoder' },
+  { url: 'https://www.artificialintelligence-news.com/feed/', source: 'AI News' },
+  { url: 'https://syncedreview.com/feed/', source: 'Synced' },
 ];
 
 // ---------------------------------------------------------------------------
@@ -1086,6 +1092,10 @@ async function fetchTrendingRepos(env) {
       `RAG retrieval augmented stars:>30 created:>${oneMonthAgo}`,
       `fine-tuning LLM stars:>30 created:>${oneWeekAgo}`,
       `AI coding assistant stars:>50 created:>${oneMonthAgo}`,
+      `chatbot open source stars:>50 created:>${oneMonthAgo}`,
+      `text-to-image generation stars:>30 created:>${oneMonthAgo}`,
+      `vector database stars:>50 created:>${oneMonthAgo}`,
+      `AI workflow automation stars:>30 created:>${oneWeekAgo}`,
     ];
 
     for (const q of searchQueries) {
@@ -1584,6 +1594,7 @@ function renderNewsPage(articles) {
     .empty-state h3 { font-size: 20px; color: var(--text-secondary); margin-bottom: 8px; }
     @media (max-width: 768px) { .news-grid { grid-template-columns: 1fr; } .nfeatured-title { font-size: 20px; } }
   </style>
+  <script type="application/ld+json">${JSON.stringify({"@context":"https://schema.org","@type":"CollectionPage","name":"AI News","description":"Latest AI news with AI-generated summaries, updated every 6 hours","url":"https://whatstrending.ai/news","publisher":{"@type":"Organization","name":"whatstrending.ai"}})}</script>
 </head>
 <body>
   ${renderNav('news')}
@@ -3097,6 +3108,7 @@ function renderReposPage(repos) {
     .empty-state { text-align: center; padding: 80px 24px; color: var(--text-tertiary); }
     .empty-state h3 { font-size: 20px; color: var(--text-secondary); margin-bottom: 8px; }
   </style>
+  <script type="application/ld+json">${JSON.stringify({"@context":"https://schema.org","@type":"CollectionPage","name":"Trending AI Repos","description":"Top trending AI and machine learning GitHub repositories with trust scores","url":"https://whatstrending.ai/repos","publisher":{"@type":"Organization","name":"whatstrending.ai"}})}</script>
 </head>
 <body>
   ${renderNav('repos')}
