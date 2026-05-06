@@ -2445,7 +2445,7 @@ function renderHomeDashboard({ newsLatest, modelRankings, trendingRepos, dashboa
 
     /* Ticker */
     .ticker-wrap { width: 100%; overflow: hidden; background: rgba(0,0,0,0.6); border-bottom: 1px solid var(--border); padding: 8px 0; }
-    .ticker { display: inline-flex; white-space: nowrap; animation: tickerScroll 25s linear infinite; }
+    .ticker { display: inline-flex; white-space: nowrap; animation: tickerScroll 12s linear infinite; }
     .ticker-item { display: inline-flex; align-items: center; gap: 6px; padding: 0 24px; font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--text-secondary); }
     .ticker-item .ticker-score { color: var(--accent); font-weight: 500; }
     @keyframes tickerScroll { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
@@ -2711,11 +2711,11 @@ function renderHTML(articles, models, trendingRepos) {
     .nav-cta:hover { background: var(--accent-hover); box-shadow: 0 4px 16px rgba(110,231,183,0.2); }
     @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
     @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-    .hero { padding: 64px 0 56px; margin-bottom: 40px; text-align: center; position: relative; overflow: hidden; border-bottom: 1px solid var(--border); background: radial-gradient(ellipse at 30% 0%, rgba(110,231,183,0.06) 0%, transparent 50%), radial-gradient(ellipse at 70% 100%, rgba(96,165,250,0.05) 0%, transparent 50%); }
-    .hero::before { content: ''; position: absolute; inset: 0; background: repeating-linear-gradient(90deg, transparent, transparent 60px, rgba(110,231,183,0.02) 60px, rgba(110,231,183,0.02) 61px); animation: heroGrid 20s linear infinite; }
-    .hero::after { content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: radial-gradient(circle at 50% 50%, rgba(110,231,183,0.03), transparent 40%); animation: heroOrb 15s ease-in-out infinite; }
-    @keyframes heroGrid { 0% { transform: translateX(0); } 100% { transform: translateX(61px); } }
-    @keyframes heroOrb { 0%,100% { transform: translate(0,0); } 50% { transform: translate(30px,-20px); } }
+    .hero { padding: 64px 0 56px; margin-bottom: 40px; text-align: center; position: relative; overflow: hidden; border-bottom: 1px solid var(--border); background: radial-gradient(ellipse at 50% 50%, rgba(110,231,183,0.04) 0%, transparent 60%); }
+    .hero::before { content: ''; position: absolute; top: 50%; left: 50%; width: 300px; height: 300px; transform: translate(-50%,-50%); border-radius: 50%; background: radial-gradient(circle, rgba(110,231,183,0.08), transparent 70%); animation: heroPulse 4s ease-in-out infinite; }
+    .hero::after { content: ''; position: absolute; top: 50%; left: 50%; width: 500px; height: 500px; transform: translate(-50%,-50%); border-radius: 50%; border: 1px solid rgba(110,231,183,0.06); animation: heroPulseRing 4s ease-in-out infinite 0.5s; }
+    @keyframes heroPulse { 0%,100% { transform: translate(-50%,-50%) scale(0.8); opacity: 0.4; } 50% { transform: translate(-50%,-50%) scale(1.2); opacity: 1; } }
+    @keyframes heroPulseRing { 0%,100% { transform: translate(-50%,-50%) scale(0.6); opacity: 0; } 50% { transform: translate(-50%,-50%) scale(1); opacity: 0.5; } }
     .hero::before { content: ''; position: absolute; bottom: -200px; left: 50%; transform: translateX(-50%); width: 600px; height: 400px; background: radial-gradient(ellipse at center, rgba(110,231,183,0.1) 0%, transparent 70%); pointer-events: none; z-index: 0; filter: blur(80px); }
     .hero-title { font-size: 40px; font-weight: 700; letter-spacing: -1.5px; line-height: 1.15; margin-bottom: 16px; color: var(--text-primary); }
     .hero-title .accent { background: linear-gradient(135deg, #00c8ff, #00ffa3, #00c8ff); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
@@ -2777,7 +2777,7 @@ function renderHTML(articles, models, trendingRepos) {
     .newsletter-btn { font-family: inherit; font-size: 13px; font-weight: 600; padding: 10px 16px; background: var(--accent); color: white; border: none; border-radius: 8px; cursor: pointer; transition: background var(--transition); width: 100%; }
     .newsletter-btn:hover { background: var(--accent-hover); }
     .ticker-wrap { overflow: hidden; border-bottom: 1px solid var(--border); background: rgba(255,255,255,0.01); margin-bottom: 40px; }
-    .ticker { display: flex; animation: tickerScroll 18s linear infinite; white-space: nowrap; }
+    .ticker { display: flex; animation: tickerScroll 10s linear infinite; white-space: nowrap; }
     .ticker-item { display: inline-flex; align-items: center; gap: 6px; padding: 10px 28px; font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--text-secondary); flex-shrink: 0; }
     .ticker-dot { width: 6px; height: 6px; border-radius: 50%; }
     .ticker-dot.up { background: #00ffa3; box-shadow: 0 0 6px rgba(16,185,129,0.5); }
