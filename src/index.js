@@ -5160,6 +5160,30 @@ export default {
       return handleApiArticlesList(request, env);
     }
 
+    // Public data feed for the awesome-ai-tools-2026 list generator.
+    // The GitHub Action in that repo fetches this weekly to regenerate the
+    // README, keeping the list auto-synced with the live catalog.
+    if (path === '/api/awesome-data' && method === 'GET') {
+      let models = SAMPLE_MODELS;
+      try {
+        if (env.NEWS_KV) {
+          const r = await env.NEWS_KV.get('model_rankings', 'json');
+          if (r && r.categories && Array.isArray(r.categories.overall) && r.categories.overall.length) {
+            models = r.categories.overall;
+          }
+        }
+      } catch { /* fall back to SAMPLE_MODELS */ }
+      return new Response(JSON.stringify({
+        generatedAt: new Date().toISOString(),
+        site: 'https://whatstrending.ai',
+        tools: AI_TOOLS_SEED,
+        comparisons: COMPARISONS,
+        models: models.slice(0, 20),
+      }), {
+        headers: { 'Content-Type': 'application/json', 'Cache-Control': 'public, max-age=3600', 'Access-Control-Allow-Origin': '*' },
+      });
+    }
+
     // Routes with dynamic segments: /api/articles/:slugOrId
     const articleSlugMatch = path.match(/^\/api\/articles\/([^/]+)$/);
     if (articleSlugMatch) {
