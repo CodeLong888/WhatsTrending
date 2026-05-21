@@ -1698,7 +1698,7 @@ function renderFooter() {
         <li><a href="/about">About</a></li>
         <li><a href="/glossary">Glossary</a></li>
         <li><a href="/alternatives">Alternatives</a></li>
-        <li><a href="https://github.com/CodeLong888/awesome-ai-tools-2026" target="_blank" rel="noopener">Awesome AI Tools</a></li>
+        <li><a href="https://github.com/0xvibly/awesome-ai-tools-2026" target="_blank" rel="noopener">Awesome AI Tools</a></li>
         <li><a href="/about#privacy">Privacy</a></li>
         <li><a href="/about#terms">Terms</a></li>
         <li><a href="https://x.com" target="_blank" rel="noopener">X / Twitter</a></li>
